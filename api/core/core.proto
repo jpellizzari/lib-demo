@@ -1,0 +1,394 @@
+syntax = "proto3";
+
+package gitops_core.v1;
+
+option go_package = "github.com/weaveworks/weave-gitops/core/api";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "api/core/types.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+      title: "Weave GitOps Core API",
+      version: "0.1";
+      description: "The API handles operations for Weave GitOps Core";
+    };
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service Core {
+    // Automations
+
+    /*
+     * ListKustomization lists Kustomizations from a cluster via GitOps.
+     */
+    rpc ListKustomizations(ListKustomizationsRequest) returns (ListKustomizationsResponse) {
+        option (google.api.http) = {
+            get : "/v1/kustomizations"
+        };
+    }
+
+    /*
+    * GetKustomization gets data about a single Kustomization from a cluster.
+    */
+    rpc GetKustomization(GetKustomizationRequest) returns (GetKustomizationResponse) {
+        option (google.api.http) = {
+            get : "/v1/kustomizations/{name}"
+        };
+    }
+
+    /*
+     * ListHelmReleases lists helm releases from a cluster.
+     */
+    rpc ListHelmReleases(ListHelmReleasesRequest) returns (ListHelmReleasesResponse) {
+        option (google.api.http) = {
+          get : "/v1/helmreleases"
+        };
+    }
+
+
+    /*
+     * GetHelmRelease gets data about a single HelmRelease from the cluster.
+     */
+    rpc GetHelmRelease(GetHelmReleaseRequest) returns (GetHelmReleaseResponse) {
+        option (google.api.http) = {
+            get : "/v1/helmrelease/{name}"
+        };
+    }
+
+
+    // Sources
+
+    /*
+     * ListGitRepository lists git repositories objects from a cluster.
+     */
+    rpc ListGitRepositories(ListGitRepositoriesRequest) returns (ListGitRepositoriesResponse) {
+        option (google.api.http) = {
+            get : "/v1/gitrepositories"
+        };
+    }
+
+    /*
+     * ListHelmCharts lists helm chart objects from a cluster.
+     */
+    rpc ListHelmCharts(ListHelmChartsRequest) returns (ListHelmChartsResponse) {
+        option (google.api.http) = {
+            get : "/v1/helmcharts"
+        };
+    }
+    /*
+     * ListHelmRepository lists helm repository objects from a cluster.
+     */
+    rpc ListHelmRepositories(ListHelmRepositoriesRequest) returns (ListHelmRepositoriesResponse) {
+        option (google.api.http) = {
+            get : "/v1/helmrepositories"
+        };
+    }
+    /*
+     * ListBuckets lists bucket objects from a cluster.
+     */
+    rpc ListBuckets(ListBucketRequest) returns (ListBucketsResponse) {
+        option (google.api.http) = {
+            get : "/v1/buckets"
+        };
+    }
+
+    /*
+    * GetObject gets data about a single primary object from a cluster.
+    */
+    rpc GetObject(GetObjectRequest) returns (GetObjectResponse) {
+        option (google.api.http) = {
+            get : "/v1/object/{name}"
+        };
+    }
+
+    // Misc
+    /*
+     * ListFluxRuntimeObjects lists the flux runtime deployments from a cluster.
+     */
+    rpc ListFluxRuntimeObjects(ListFluxRuntimeObjectsRequest) returns (ListFluxRuntimeObjectsResponse) {
+        option (google.api.http) = {
+          get : "/v1/flux_runtime_objects"
+        };
+    }
+
+    /**
+    * GetReconciledObjects returns a list of objects that were created as a result a Flux automation.
+    * This list is derived by looking at the Kustomization or HelmRelease specified in the request body.
+    */
+    rpc GetReconciledObjects(GetReconciledObjectsRequest) returns (GetReconciledObjectsResponse) {
+        option (google.api.http) = {
+            post : "/v1/reconciled_objects"
+            body: "*"
+        };
+    };
+
+    /**
+    * GetChildObjects returns the children of a given object, specified by a GroupVersionKind.
+    * Not all Kubernets objects have children. For example, a Deployment has a child ReplicaSet, but a Service has no child objects.
+    */
+    rpc GetChildObjects(GetChildObjectsRequest) returns (GetChildObjectsResponse) {
+        option (google.api.http) = {
+            post : "/v1/child_objects"
+            body: "*"
+        };
+    };
+
+    /*
+     * GetFluxNamespace returns with a namespace with a specific label.
+     */
+    rpc GetFluxNamespace(GetFluxNamespaceRequest) returns (GetFluxNamespaceResponse) {
+        option (google.api.http) = {
+            post: "/v1/namespace/flux"
+            body: "*"
+        };
+    }
+
+    /*
+     * ListNamespaces returns with the list of available namespaces.
+     */
+    rpc ListNamespaces(ListNamespacesRequest) returns (ListNamespacesResponse) {
+        option (google.api.http) = {
+            get: "/v1/namespaces"
+        };
+    }
+    /*
+     * ListEvents returns with a list of events
+     */
+    rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
+        option (google.api.http) = {
+            get: "/v1/events"
+        };
+    }
+
+    /*
+     * SyncResource forces a reconciliation of a Flux resource
+     */
+    rpc SyncFluxObject(SyncFluxObjectRequest) returns (SyncFluxObjectResponse) {
+        option (google.api.http) = {
+            post: "/v1/sync"
+            body: "*"
+        };
+    }
+
+    /*
+     * GetVersion returns version information about the server
+     */
+    rpc GetVersion(GetVersionRequest) returns (GetVersionResponse){
+        option (google.api.http) = {
+            get: "/v1/version"
+        };
+    }
+
+    /**
+    * GetFeatureFlags returns configuration information about the server
+    */
+    rpc GetFeatureFlags(GetFeatureFlagsRequest) returns (GetFeatureFlagsResponse) {
+        option (google.api.http) = {
+            get : "/v1/featureflags"
+        };
+    }
+
+    /*
+     * ToggleSuspendResource suspends or resumes a flux object.
+     */
+    rpc ToggleSuspendResource(ToggleSuspendResourceRequest) returns (ToggleSuspendResourceResponse) {
+        option (google.api.http) = {
+            post: "/v1/suspend"
+            body: "*"
+        };
+    }
+}
+
+message Pagination {
+    int32 pageSize = 1;
+    string pageToken = 2;
+}
+
+message ListError {
+    string clusterName = 1;
+    string namespace = 2;
+    string message = 3;
+}
+
+message ListKustomizationsRequest {
+    string namespace = 1;
+    Pagination pagination = 2;
+}
+
+message ListKustomizationsResponse {
+    repeated Kustomization kustomizations = 1;
+    string nextPageToken = 2;
+    repeated ListError errors = 3;
+}
+
+message ListHelmReleasesRequest {
+    string namespace = 1;
+}
+
+message ListHelmReleasesResponse {
+    repeated HelmRelease helmReleases = 1;
+    repeated ListError errors = 2;
+}
+
+message GetHelmReleaseRequest {
+    string name        = 1;
+    string namespace   = 2;
+    string clusterName = 3;
+}
+
+message GetHelmReleaseResponse {
+    HelmRelease helmRelease = 1;
+}
+
+message ListGitRepositoriesRequest {
+    string namespace = 1;
+}
+
+message ListGitRepositoriesResponse {
+    repeated GitRepository gitRepositories = 1;
+    repeated ListError errors = 2;
+}
+
+message ListHelmRepositoriesRequest {
+    string namespace = 1;
+}
+
+message ListHelmRepositoriesResponse {
+    repeated HelmRepository helmRepositories = 1;
+    repeated ListError errors = 2;
+}
+
+message ListBucketRequest {
+    string namespace = 1;
+}
+
+message ListBucketsResponse {
+    repeated Bucket buckets = 1;
+    repeated ListError errors = 2;
+}
+
+message ListFluxRuntimeObjectsRequest {
+    string namespace   = 1;
+    string clusterName = 2;
+}
+
+message ListFluxRuntimeObjectsResponse {
+    repeated Deployment deployments = 1;
+    repeated ListError errors = 2;
+}
+
+message ListHelmChartsRequest {
+    string namespace = 1;
+}
+
+message ListHelmChartsResponse {
+    repeated HelmChart helmCharts = 1;
+}
+
+message GetKustomizationRequest {
+    string name        = 1;
+    string namespace   = 2;
+    string clusterName = 3;
+}
+
+message GetKustomizationResponse {
+    Kustomization kustomization = 1;
+}
+
+message GetObjectRequest {
+    string name        = 1;
+    string namespace   = 2;
+    string kind        = 3;
+    string clusterName = 4;
+}
+
+message GetObjectResponse {
+    Object object = 1;
+}
+
+message GetReconciledObjectsRequest {
+    string         automationName         = 1;
+    string         namespace              = 2;
+    FluxObjectKind automationKind         = 3;
+    repeated       GroupVersionKind kinds = 4;
+    string         clusterName            = 5;
+}
+
+message GetReconciledObjectsResponse {
+    repeated UnstructuredObject objects = 1;
+}
+
+message GetChildObjectsRequest {
+    GroupVersionKind groupVersionKind = 1;
+    string           namespace        = 2;
+    string           parentUid        = 3;
+    string           clusterName      = 4;
+}
+
+message GetChildObjectsResponse {
+    repeated UnstructuredObject objects = 1;
+}
+
+message GetFluxNamespaceRequest {}
+
+message GetFluxNamespaceResponse {
+  string name = 1;
+}
+
+message ListNamespacesRequest {}
+
+message ListNamespacesResponse {
+  repeated Namespace namespaces = 1;
+}
+
+message ListEventsRequest {
+    ObjectRef involvedObject = 2;
+}
+
+message ListEventsResponse {
+    repeated Event events = 1;
+}
+
+message SyncFluxObjectRequest {
+    string         name        = 1;
+    string         namespace   = 2;
+    FluxObjectKind kind        = 3;
+    string         clusterName = 4;
+    bool           withSource  = 5;
+}
+
+message SyncFluxObjectResponse {
+}
+
+message GetVersionRequest {}
+
+message GetVersionResponse {
+    string semver    = 1;
+    string commit    = 2;
+    string branch    = 3;
+    string buildTime = 4;
+    string fluxVersion = 5;
+    string kubeVersion = 6;
+}
+
+message GetFeatureFlagsRequest {}
+
+message GetFeatureFlagsResponse {
+    map<string, string> flags = 1;
+}
+
+message ToggleSuspendResourceRequest {
+    FluxObjectKind kind        = 1;
+    string         name        = 2;
+    string         namespace   = 3;
+    string         clusterName = 4;
+    bool           suspend     = 5;
+}
+
+message ToggleSuspendResourceResponse {
+
+}
